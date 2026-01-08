@@ -92,3 +92,14 @@ export default function App() {
     </Routes>
   );
 }
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/verse" element={<VersePage />} />
+      <Route path="/players" element={<PlayersPage />} />
+    </Routes>
+  );
+}
+
