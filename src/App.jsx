@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
 
 async function fetchVerse(name) {
   const response = await fetch(`${name}.txt`);
@@ -68,6 +71,7 @@ function VersePage() {
       <Typography variant="h5">チーム名と選手</Typography>
 
       <select
+        style={{ width: 300, padding: 6 }}
         onChange={(e) => fetchVerse(e.target.value).then(setContent)}
       >
         <option value="verse1">KADOKAWAサクラナイツ</option>
@@ -140,4 +144,3 @@ export default function App() {
     </Routes>
   );
 }
-
