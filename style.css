@@ -4,9 +4,17 @@ pre {
 }
 
 body {
-  width: 500px;
-  margin: 0 auto;
-  background-color: #ccc;
+  width: 520px;
+  margin: 40px auto;
+  background-color: #f2f2f2;
+}
+
+/* 全体をカード風に */
+.container {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 pre {
