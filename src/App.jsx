@@ -55,41 +55,34 @@ function VersePage() {
 
 function PlayersPage() {
   return (
-    <>
-      <h1>各チームと選手</h1>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: "#e1b7ffff",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        pt: 4,
+        gap: 2,
+      }}
+    >
+      <Typography variant="h5">チーム順位（2025-26/01/07）</Typography>
 
-      <ul>
-        <li>
-          角川サクラナイツ
-          <ul>
-            <li>岡田紗佳</li>
-            <li>堀慎吾</li>
-            <li>渋川難波</li>
-            <li>内川幸太郎</li>
-          </ul>
-        </li>
-
-        <li>
-          KONAMI麻雀格闘倶楽部
-          <ul>
-            <li>佐々木寿人</li>
-            <li>高宮まり</li>
-            <li>伊達朱里紗</li>
-            <li>滝沢和典</li>
-          </ul>
-        </li>
-      </ul>
-    </>
-  );
-}
-
-
-export default function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/verse" element={<VersePage />} />
-    </Routes>
+      <Paper sx={{ width: "90%", maxWidth: 500, p: 2 }}>
+        <ol>
+          <li>EX風林火山</li>
+          <li>KONAMI麻雀格闘倶楽部</li>
+          <li>BEAST X</li>
+          <li>セガサミーフェニックス</li>
+          <li>TEAM RAIDEN / 雷電</li>
+          <li>渋谷ABEMAS</li>
+          <li>赤坂ドリブンズ</li>
+          <li>EARTH JETS</li>
+          <li>U-NEXT Pirates</li>
+          <li>KADOKAWAサクラナイツ</li>
+        </ol>
+      </Paper>
+    </Box>
   );
 }
 
