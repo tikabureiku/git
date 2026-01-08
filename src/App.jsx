@@ -10,15 +10,39 @@ async function fetchVerse(name) {
 function HomePage() {
   const navigate = useNavigate();
   return (
-    <>
-      <h1>大和証券Mリーグ</h1>
-      <Button variant="contained" onClick={() => navigate("/verse")}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: "#ffb6b6ff",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 3,
+      }}
+    >
+      <Typography variant="h4" fontWeight="bold">
+        大和証券Mリーグ
+      </Typography>
+
+      <Button
+        variant="contained"
+        color="success"
+        size="large"
+        onClick={() => navigate("/verse")}
+      >
         各チームと選手一覧
       </Button>
-      <Button variant="contained" onClick={()=> navigate("/players")}>
+
+      <Button
+        variant="contained"
+        color="secondary"
+        size="large"
+        onClick={() => navigate("/players")}
+      >
         チーム順位
       </Button>
-    </>
+    </Box>
   );
 }
 
@@ -30,8 +54,18 @@ function VersePage() {
   }, []);
 
   return (
-    <>
-      <h1>チーム名</h1>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: "#d9ffd7ff",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        pt: 4,
+        gap: 2,
+      }}
+    >
+      <Typography variant="h5">チーム名と選手</Typography>
 
       <select
         onChange={(e) => fetchVerse(e.target.value).then(setContent)}
@@ -48,8 +82,19 @@ function VersePage() {
         <option value="verse10">U-NEXT Pirates</option>
       </select>
 
-      <pre>{content}</pre>
-    </>
+      <Paper
+        elevation={3}
+        sx={{
+          width: "90%",
+          maxWidth: 500,
+          p: 2,
+          mt: 2,
+          whiteSpace: "pre-wrap",
+        }}
+      >
+        {content}
+      </Paper>
+    </Box>
   );
 }
 
