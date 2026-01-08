@@ -3,55 +3,48 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 
 async function fetchVerse(name) {
-  const url = `${name}.txt`;
-  const response = await fetch(url);
+  const response = await fetch(`${name}.txt`);
   return response.text();
 }
 
-export function HomePage() {
+function HomePage() {
   const navigate = useNavigate();
   return (
     <>
-      <h1>Home Page</h1>
+      <h1>大和証券Mリーグ</h1>
       <Button variant="contained" onClick={() => navigate("/verse")}>
-        詩のページへ移動する
+        各チームと選手一覧
       </Button>
     </>
   );
 }
 
-export function VersePage() {
+function VersePage() {
   const [content, setContent] = useState("");
 
   useEffect(() => {
-    (async () => {
-      const newContent = await fetchVerse("verse1");
-      setContent(newContent);
-    })();
+    fetchVerse("verse1").then(setContent);
   }, []);
 
   return (
     <>
-      <h1>Fetch starting point</h1>
-      <form>
-        <label htmlFor="verse-choose">Choose a verse</label>
-        <select
-          id="verse-choose"
-          onChange={async (event) => {
-            const selectedValue = event.target.value;
-            const newContent = await fetchVerse(selectedValue);
-            setContent(newContent);
-          }}
-        >
-          <option value="verse1">Verse 1</option>
-          <option value="verse2">Verse 2</option>
-          <option value="verse3">Verse 3</option>
-          <option value="verse4">Verse 4</option>
-        </select>
-      </form>
-      <h2>
-        The Conqueror Worm, <em>Edgar Allen Poe, 1843</em>
-      </h2>
+      <h1>チーム名</h1>
+
+      <select
+        onChange={(e) => fetchVerse(e.target.value).then(setContent)}
+      >
+        <option value="verse1">KADOKAWAサクラナイツ</option>
+        <option value="verse2">EX風林火山</option>
+        <option value="verse3">渋谷ABEMAS</option>
+        <option value="verse4">セガサミーフェニックス</option>
+        <option value="verse5">TEAM RAIDEN-雷電</option>
+        <option value="verse6">EARTH JETS</option>
+        <option value="verse7">KONAMI麻雀格闘倶楽部</option>
+        <option value="verse8">BEAST X</option>
+        <option value="verse9">赤坂ドリブンズ</option>
+        <option value="verse10">U-NEXT Pirates</option>
+      </select>
+
       <pre>{content}</pre>
     </>
   );
