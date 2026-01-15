@@ -118,7 +118,7 @@ function VersePage() {
 }
 
 /* ===============================
-   チーム順位（JSON fetch）
+   チーム順位（rankで並び替え・10分更新）
 ================================ */
 function PlayersPage() {
   const [standings, setStandings] = useState([]);
@@ -126,14 +126,24 @@ function PlayersPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/standings.json")
-      .then((res) => res.json())
-      .then((data) => {
-        setStandings(data.standings);
-        setUpdated(data.updated);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    const load = () => {
+      fetch("/standings.json")
+        .then((res) => res.json())
+        .then((data) => {
+          setStandings(data.standings);
+          setUpdated(data.updated);
+          setLoading(false);
+        })
+        .catch(() => {
+          setUpdated("取得失敗");
+          setLoading(false);
+        });
+    };
+
+    load(); // 初回取得
+    const timer = setInterval(load, 600000); // ★10分ごと更新
+
+    return () => clearInterval(timer);
   }, []);
 
   return (
@@ -157,9 +167,11 @@ function PlayersPage() {
           <Typography align="center">読み込み中...</Typography>
         ) : (
           <ol>
-            {standings.map((item) => (
-              <li key={item.rank}>{item.team}</li>
-            ))}
+            {[...standings]
+              .sort((a, b) => a.rank - b.rank)
+              .map((item) => (
+                <li key={item.team}>{item.team}</li>
+              ))}
           </ol>
         )}
       </Paper>
