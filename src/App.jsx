@@ -5,13 +5,25 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 
+/* ===============================
+   共通：テキスト取得
+================================ */
 async function fetchVerse(name) {
-  const response = await fetch(`${name}.txt`);
-  return response.text();
+  try {
+    const response = await fetch(`${name}.txt`);
+    if (!response.ok) throw new Error("fetch error");
+    return await response.text();
+  } catch {
+    return "データの取得に失敗しました";
+  }
 }
 
+/* ===============================
+   Home
+================================ */
 function HomePage() {
   const navigate = useNavigate();
+
   return (
     <Box
       sx={{
@@ -49,6 +61,9 @@ function HomePage() {
   );
 }
 
+/* ===============================
+   チーム・選手一覧
+================================ */
 function VersePage() {
   const [content, setContent] = useState("");
 
@@ -102,7 +117,25 @@ function VersePage() {
   );
 }
 
+/* ===============================
+   チーム順位（JSON fetch）
+================================ */
 function PlayersPage() {
+  const [standings, setStandings] = useState([]);
+  const [updated, setUpdated] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/standings.json")
+      .then((res) => res.json())
+      .then((data) => {
+        setStandings(data.standings);
+        setUpdated(data.updated);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
   return (
     <Box
       sx={{
@@ -115,26 +148,28 @@ function PlayersPage() {
         gap: 2,
       }}
     >
-      <Typography variant="h5">チーム順位（2025-26/01/07）</Typography>
+      <Typography variant="h5">
+        チーム順位（{updated || "取得中"}）
+      </Typography>
 
       <Paper sx={{ width: "90%", maxWidth: 500, p: 2 }}>
-        <ol>
-          <li>EX風林火山</li>
-          <li>KONAMI麻雀格闘倶楽部</li>
-          <li>BEAST X</li>
-          <li>セガサミーフェニックス</li>
-          <li>TEAM RAIDEN / 雷電</li>
-          <li>渋谷ABEMAS</li>
-          <li>赤坂ドリブンズ</li>
-          <li>EARTH JETS</li>
-          <li>U-NEXT Pirates</li>
-          <li>KADOKAWAサクラナイツ</li>
-        </ol>
+        {loading ? (
+          <Typography align="center">読み込み中...</Typography>
+        ) : (
+          <ol>
+            {standings.map((item) => (
+              <li key={item.rank}>{item.team}</li>
+            ))}
+          </ol>
+        )}
       </Paper>
     </Box>
   );
 }
 
+/* ===============================
+   App
+================================ */
 export default function App() {
   return (
     <Routes>
