@@ -38,6 +38,8 @@ function HomePage() {
   }, []);
 
   const handleSearch = () => {
+    if (!query) return;
+
     const found = players.find((p) => p.name.includes(query));
     if (found) {
       navigate(`/verse?team=${found.verse}`);
@@ -56,33 +58,71 @@ function HomePage() {
         justifyContent: "center",
         alignItems: "center",
         gap: 2,
+        px: 1, // ← スマホ横余白
       }}
     >
       <Typography variant="h4" fontWeight="bold">
         大和証券Mリーグ
       </Typography>
 
-      <Paper sx={{ p: 2, width: 320 }}>
-        <Typography fontWeight="bold">選手検索</Typography>
+      <Paper
+        sx={{
+          p: 1.5,
+          width: "90%",
+          maxWidth: 280,
+        }}
+      >
+        <Typography fontWeight="bold" fontSize={14}>
+          選手検索
+        </Typography>
 
         <input
           type="text"
           placeholder="選手名を入力"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          style={{ width: "100%", padding: 6, marginTop: 8 }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSearch();
+          }}
+          style={{
+            width: "100%",
+            height: 34,
+            boxSizing: "border-box",
+            padding: "0 10px",
+            marginTop: 8,
+            fontSize: 14,
+            lineHeight: "34px",
+            border: "1px solid #ccc",
+            borderRadius: 6,
+          }}
         />
 
-        <Button fullWidth sx={{ mt: 1 }} variant="contained" onClick={handleSearch}>
+        <Button
+          fullWidth
+          size="small"
+          sx={{ mt: 1, fontSize: 13 }}
+          variant="contained"
+          onClick={handleSearch}
+        >
           検索
         </Button>
       </Paper>
 
-      <Button variant="contained" color="success" onClick={() => navigate("/verse")}>
+      <Button
+        sx={{ width: "90%", maxWidth: 280 }}
+        variant="contained"
+        color="success"
+        onClick={() => navigate("/verse")}
+      >
         各チームと選手一覧
       </Button>
 
-      <Button variant="contained" color="secondary" onClick={() => navigate("/players")}>
+      <Button
+        sx={{ width: "90%", maxWidth: 280 }}
+        variant="contained"
+        color="secondary"
+        onClick={() => navigate("/players")}
+      >
         チーム順位
       </Button>
     </Box>
@@ -111,12 +151,18 @@ function VersePage() {
         alignItems: "center",
         pt: 4,
         gap: 2,
+        px: 1,
       }}
     >
       <Typography variant="h5">チーム名と選手</Typography>
 
       <select
-        style={{ width: 300, padding: 6 }}
+        style={{
+          width: "90%",
+          maxWidth: 320,
+          padding: 8,
+          fontSize: 14,
+        }}
         defaultValue={searchParams.get("team") || "verse1"}
         onChange={(e) => fetchVerse(e.target.value).then(setContent)}
       >
@@ -132,7 +178,14 @@ function VersePage() {
         <option value="verse10">U-NEXT Pirates</option>
       </select>
 
-      <Paper sx={{ width: "90%", maxWidth: 500, p: 2, whiteSpace: "pre-wrap" }}>
+      <Paper
+        sx={{
+          width: "90%",
+          maxWidth: 500,
+          p: 2,
+          whiteSpace: "pre-wrap",
+        }}
+      >
         {content}
       </Paper>
     </Box>
@@ -175,6 +228,7 @@ function PlayersPage() {
         alignItems: "center",
         pt: 4,
         gap: 1,
+        px: 1,
       }}
     >
       <Typography variant="h5">チーム順位</Typography>
