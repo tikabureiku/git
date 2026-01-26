@@ -1,28 +1,50 @@
 import { useEffect, useState } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 
 /* ===============================
-   共通：テキスト取得
+   共通：verse 取得
 ================================ */
 async function fetchVerse(name) {
   try {
-    const response = await fetch(`${name}.txt`);
-    if (!response.ok) throw new Error("fetch error");
-    return await response.text();
+    const res = await fetch(`/${name}.txt`);
+    if (!res.ok) throw new Error();
+    return await res.text();
   } catch {
     return "データの取得に失敗しました";
   }
 }
 
 /* ===============================
-   Home
+   Home（選手検索）
 ================================ */
 function HomePage() {
   const navigate = useNavigate();
+  const [players, setPlayers] = useState([]);
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    fetch("/players.json")
+      .then((res) => res.json())
+      .then((data) => setPlayers(data.players));
+  }, []);
+
+  const handleSearch = () => {
+    const found = players.find((p) => p.name.includes(query));
+    if (found) {
+      navigate(`/verse?team=${found.verse}`);
+    } else {
+      alert("該当する選手が見つかりません");
+    }
+  };
 
   return (
     <Box
@@ -33,28 +55,34 @@ function HomePage() {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        gap: 3,
+        gap: 2,
       }}
     >
       <Typography variant="h4" fontWeight="bold">
         大和証券Mリーグ
       </Typography>
 
-      <Button
-        variant="contained"
-        color="success"
-        size="large"
-        onClick={() => navigate("/verse")}
-      >
+      <Paper sx={{ p: 2, width: 320 }}>
+        <Typography fontWeight="bold">選手検索</Typography>
+
+        <input
+          type="text"
+          placeholder="選手名を入力"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          style={{ width: "100%", padding: 6, marginTop: 8 }}
+        />
+
+        <Button fullWidth sx={{ mt: 1 }} variant="contained" onClick={handleSearch}>
+          検索
+        </Button>
+      </Paper>
+
+      <Button variant="contained" color="success" onClick={() => navigate("/verse")}>
         各チームと選手一覧
       </Button>
 
-      <Button
-        variant="contained"
-        color="secondary"
-        size="large"
-        onClick={() => navigate("/players")}
-      >
+      <Button variant="contained" color="secondary" onClick={() => navigate("/players")}>
         チーム順位
       </Button>
     </Box>
@@ -62,14 +90,16 @@ function HomePage() {
 }
 
 /* ===============================
-   チーム・選手一覧
+   Verse（検索連動）
 ================================ */
 function VersePage() {
   const [content, setContent] = useState("");
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    fetchVerse("verse1").then(setContent);
-  }, []);
+    const team = searchParams.get("team") || "verse1";
+    fetchVerse(team).then(setContent);
+  }, [searchParams]);
 
   return (
     <Box
@@ -87,6 +117,7 @@ function VersePage() {
 
       <select
         style={{ width: 300, padding: 6 }}
+        defaultValue={searchParams.get("team") || "verse1"}
         onChange={(e) => fetchVerse(e.target.value).then(setContent)}
       >
         <option value="verse1">KADOKAWAサクラナイツ</option>
@@ -101,16 +132,7 @@ function VersePage() {
         <option value="verse10">U-NEXT Pirates</option>
       </select>
 
-      <Paper
-        elevation={3}
-        sx={{
-          width: "90%",
-          maxWidth: 500,
-          p: 2,
-          mt: 2,
-          whiteSpace: "pre-wrap",
-        }}
-      >
+      <Paper sx={{ width: "90%", maxWidth: 500, p: 2, whiteSpace: "pre-wrap" }}>
         {content}
       </Paper>
     </Box>
@@ -118,7 +140,7 @@ function VersePage() {
 }
 
 /* ===============================
-   チーム順位（rankで並び替え・10分更新）
+   Players（順位）
 ================================ */
 function PlayersPage() {
   const [standings, setStandings] = useState([]);
@@ -133,18 +155,15 @@ function PlayersPage() {
           setStandings(data.standings);
           setUpdated(data.updated);
           setLoading(false);
-        })
-        .catch(() => {
-          setUpdated("取得失敗");
-          setLoading(false);
         });
     };
-
-    load(); // 初回取得
-    const timer = setInterval(load, 600000); // ★10分ごと更新
-
+    load();
+    const timer = setInterval(load, 600000);
     return () => clearInterval(timer);
   }, []);
+
+  const color = (rank) =>
+    rank === 1 ? "#d4af37" : rank === 2 ? "#c0c0c0" : rank === 3 ? "#cd7f32" : "";
 
   return (
     <Box
@@ -155,12 +174,11 @@ function PlayersPage() {
         flexDirection: "column",
         alignItems: "center",
         pt: 4,
-        gap: 2,
+        gap: 1,
       }}
     >
-      <Typography variant="h5">
-        チーム順位（{updated || "取得中"}）
-      </Typography>
+      <Typography variant="h5">チーム順位</Typography>
+      <Typography variant="body2">最終更新：{updated || "取得中"}</Typography>
 
       <Paper sx={{ width: "90%", maxWidth: 500, p: 2 }}>
         {loading ? (
@@ -169,8 +187,16 @@ function PlayersPage() {
           <ol>
             {[...standings]
               .sort((a, b) => a.rank - b.rank)
-              .map((item) => (
-                <li key={item.team}>{item.team}</li>
+              .map((s) => (
+                <li
+                  key={s.team}
+                  style={{
+                    color: color(s.rank),
+                    fontWeight: s.rank <= 3 ? "bold" : "normal",
+                  }}
+                >
+                  {s.team}
+                </li>
               ))}
           </ol>
         )}
